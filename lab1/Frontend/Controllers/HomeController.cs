@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Frontend.Models;
+using System.Net.Http;
+using System.IO;
 
 namespace Frontend.Controllers
 {
@@ -15,12 +19,25 @@ namespace Frontend.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public IActionResult Upload()
         {
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [HttpPost]
+        public async Task<IActionResult> Upload(string data)
+        {
+            string id = null; 
+            HttpClient httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri("http://127.0.0.1:4888/");
+            string json = JsonConvert.SerializeObject(data);
+            HttpContent content = new StringContent(json);
+            HttpResponseMessage response = await httpClient.PostAsync("/api/values", content);
+            id = await response.Content.ReadAsStringAsync();
+            return Ok(id);
+        }
+
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
