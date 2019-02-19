@@ -1,1 +1,0 @@
-dotnet build -p:Version=%1
