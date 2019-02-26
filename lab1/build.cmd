@@ -44,8 +44,8 @@ EXIT /B 0
 
 :CreateRunScript
   (
-    @ECHO start "%FRONTEND_WINDOW_NAME%" dotnet %FRONTEND_NAME%/%FRONTEND_NAME%.dll
     @ECHO start "%BACKEND_WINDOW_NAME%" dotnet %BACKEND_NAME%/%BACKEND_NAME%.dll
+    @ECHO start "%FRONTEND_WINDOW_NAME%" dotnet %FRONTEND_NAME%/%FRONTEND_NAME%.dll 
   ) > %BUILD_DIR%/run.cmd
   EXIT /B 0
 
