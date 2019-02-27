@@ -35,7 +35,7 @@ namespace Frontend.Controllers
             HttpContent content = new StringContent(json);
             HttpResponseMessage response = await httpClient.PostAsync("/api/values", content);
             id = await response.Content.ReadAsStringAsync();
-            return Ok(id);
+            return Redirect("~/Home/TextDetails");
         }
 
         public IActionResult Error()

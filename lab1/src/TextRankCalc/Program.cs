@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace TextListener
 {
@@ -8,9 +9,10 @@ namespace TextListener
         {
             var redis = RedisStore.Database;
             var sub = redis.Multiplexer.GetSubscriber();
-            sub.Subscribe("events", (channel, message) => {
-                Console.WriteLine("id: " + (string)message);
-                Console.WriteLine("val: " + redis.StringGet((string)message));
+            sub.Subscribe("TextCreated", (channel, message) => {
+               var body = message;
+               var messageId = Encoding.UTF8.GetString(body);
+               Console.WriteLine("Message: ", redis.StringGet(messageId));
             });
             Console.ReadLine();
         }
