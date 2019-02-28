@@ -6,13 +6,12 @@ namespace TextListener
     {
         static void Main(string[] args)
         {
-            var redis = RedisStore.RedisCache;
-            var sub = redis.Multiplexer.GetSubscriber();
-            sub.Subscribe("events", (channel, message) => {
-                Console.WriteLine("шd: " + (string)message);
-                Console.WriteLine("val: " + redis.StringGet((string)message));
+            var database = RedisStore.database;
+            var subscriber = database.Multiplexer.GetSubscriber();
+            subscriber.Subscribe("events", (channel, message) => {
+                Console.WriteLine("id: " + (string)message);
             });
-            Console.ReadLine();
+            Console.ReadLine(); 
         }
     }
 }
