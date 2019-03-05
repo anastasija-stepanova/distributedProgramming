@@ -33,8 +33,9 @@ namespace Backend.Controllers
             this.CreateEvent(redis, id, value);
             return id;
         }
+
         private void CreateEvent(StackExchange.Redis.ConnectionMultiplexer redis, String id, String value)
-         {
+        {
             ISubscriber sub = redis.GetSubscriber();
             sub.Publish("events", id);
         }
@@ -42,9 +43,6 @@ namespace Backend.Controllers
         private void SaveToDatabase(StackExchange.Redis.IDatabase database, string id, string value)
         {
             database.StringSet(id, value);
-            string data = database.StringGet(id);
-            Console.WriteLine("id: ", id);
-            Console.WriteLine("data: ", data);
         }
     }
 }

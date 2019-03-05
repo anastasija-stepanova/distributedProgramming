@@ -9,7 +9,7 @@ namespace TextListener
             var database = RedisStore.database;
             var subscriber = database.Multiplexer.GetSubscriber();
             subscriber.Subscribe("events", (channel, message) => {
-                Console.WriteLine("id: " + (string)message);
+                Console.WriteLine("id: " + database.StringGet((string)message));
             });
             Console.ReadLine(); 
         }
