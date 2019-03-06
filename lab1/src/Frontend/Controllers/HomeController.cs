@@ -9,6 +9,8 @@ using Frontend.Models;
 using System.Net.Http;
 using System.IO;
 using System.Net.Http.Headers;
+using System.Web;
+using Microsoft.AspNetCore.Http.Extensions; 
 
 namespace Frontend.Controllers
 {
@@ -26,8 +28,21 @@ namespace Frontend.Controllers
         }
        
         [HttpGet]
-        public IActionResult TextDetails()
+        public async Task<IActionResult> TextDetails(string id)
         {
+            ViewData["test"] = id;
+
+HttpClient httpClient = new HttpClient();
+        //  HttpResponseMessage response = await httpClient.GetStringAsync($"http://127.0.0.1:4888/api/values/{id}");
+        //  response.EnsureSuccessStatusCode();
+        //  string responseBody = await response.Content.ReadAsStringAsync();
+
+         Console.WriteLine(await httpClient.GetStringAsync($"http://127.0.0.1:4888/api/values/{id}"));
+    
+            // HttpClient httpClient = new HttpClient();
+            // httpClient.BaseAddress = new Uri("http://127.0.0.1:4888/");
+            // HttpResponseMessage response = await httpClient.GetAsync("/api/values", id);
+            // var data = await response.Content.ReadAsStringAsync();
             return View();      
         }
 
