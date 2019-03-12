@@ -15,15 +15,6 @@ namespace Backend.Controllers
         static readonly ConcurrentDictionary<string, string> _data = new ConcurrentDictionary<string, string>();
         public static ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379");
         public static IDatabase database = redis.GetDatabase(); 
-        // GET api/values/<id>
-        [HttpGet("{id}")]
-        public string Get(string id)
-        {
-            string value = null;
-            _data.TryGetValue(id, out value);
-            this.CreateEvent(redis, id, value);
-            return value;
-        }
 
         // POST api/values
         [HttpPost]
@@ -31,20 +22,33 @@ namespace Backend.Controllers
         {
             var id = Guid.NewGuid().ToString();
             this.SaveToDatabase(database, id, value);
-            this.CreateEvent(redis, id, value);
+            this.CreateEvent(redis, id, "events", value);
+            this.CreateEvent(redis, id, "TextCreated");
             return id;
         }
 
-        private void CreateEvent(StackExchange.Redis.ConnectionMultiplexer redis, String id, String value)
+        private void CreateEvent(StackExchange.Redis.ConnectionMultiplexer redis, String id, string events, String value = null)
         {
             ISubscriber sub = redis.GetSubscriber();
-            sub.Publish("events", id);
-            sub.Publish("TextCreated", id);
+            sub.Publish(events, id);
         }
-
         private void SaveToDatabase(StackExchange.Redis.IDatabase database, string id, string value)
         {
             database.StringSet(id, value);
         }
+
+        // GET api/values/<id>
+        [HttpGet("{id}")]
+        public string Get([FromRoute] string id)
+        {
+            string value = null;
+            _data.TryGetValue(id, out value);
+            string currentId = (string)id;
+            var data = database.StringGet("Rank_" + currentId);
+            Console.WriteLine("id: " + data);
+            Console.WriteLine("currentId: " + "Rank_" + currentId);
+            return data;
+        }
+
     }
 }

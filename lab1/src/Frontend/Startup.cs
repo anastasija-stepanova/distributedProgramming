@@ -57,7 +57,7 @@ namespace Frontend
                     template: "{controller=Home}/{action=Index}/{id?}");
                 routes.MapRoute(
                     name: "upload",
-                    template: "{controller=Home}/{action=TextDetails}");
+                    template: "{controller=Home}/{action=TextDetails}/{id}");
             });
         }
     }

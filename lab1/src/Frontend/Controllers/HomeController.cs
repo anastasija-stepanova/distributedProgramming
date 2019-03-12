@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Web;
-using Microsoft.AspNetCore.Http.Extensions; 
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Frontend.Controllers
 {
@@ -26,39 +26,31 @@ namespace Frontend.Controllers
         {
             return View();
         }
-       
+
         [HttpGet]
         public async Task<IActionResult> TextDetails(string id)
         {
-            ViewData["test"] = id;
+            HttpClient httpClient = new HttpClient();
+            HttpResponseMessage response = await httpClient.GetAsync("http://localhost:4888/api/values/" + id);
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
 
-HttpClient httpClient = new HttpClient();
-        //  HttpResponseMessage response = await httpClient.GetStringAsync($"http://127.0.0.1:4888/api/values/{id}");
-        //  response.EnsureSuccessStatusCode();
-        //  string responseBody = await response.Content.ReadAsStringAsync();
-
-         Console.WriteLine(await httpClient.GetStringAsync($"http://127.0.0.1:4888/api/values/{id}"));
-    
-            // HttpClient httpClient = new HttpClient();
-            // httpClient.BaseAddress = new Uri("http://127.0.0.1:4888/");
-            // HttpResponseMessage response = await httpClient.GetAsync("/api/values", id);
-            // var data = await response.Content.ReadAsStringAsync();
-            return View();      
+            ViewData["rank"] = responseBody;
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Upload(string data)
         {
-            string id = null; 
+            string id = null;
             HttpClient httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri("http://127.0.0.1:4888/");
-            FormUrlEncodedContent content = new FormUrlEncodedContent(new[] { 
-                new KeyValuePair<string, string>("value", data) 
+            FormUrlEncodedContent content = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>("value", data)
             });
             HttpResponseMessage response = await httpClient.PostAsync("/api/values", content);
             id = await response.Content.ReadAsStringAsync();
-            return new RedirectResult("http://localhost:5000/Home/TextDetails?id=" + id);
-            return Ok(id);
+            return new RedirectResult("http://localhost:5000/Home/TextDetails/" + id);
         }
 
         public IActionResult Error()
