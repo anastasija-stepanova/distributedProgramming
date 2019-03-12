@@ -31,7 +31,7 @@ namespace Frontend.Controllers
         public async Task<IActionResult> TextDetails(string id)
         {
             HttpClient httpClient = new HttpClient();
-            HttpResponseMessage response = await httpClient.GetAsync("http://localhost:4888/api/values/" + id);
+            HttpResponseMessage response = await httpClient.GetAsync("http://127.0.0.1:4888/api/values/" + id);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 

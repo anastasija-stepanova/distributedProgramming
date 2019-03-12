@@ -6,12 +6,12 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.2": {
-      "TextRankCalc/0.0.1": {
+      "TextListener/0.0.1": {
         "dependencies": {
           "StackExchange.Redis": "2.0.568"
         },
         "runtime": {
-          "TextRankCalc.dll": {}
+          "TextListener.dll": {}
         }
       },
       "Microsoft.Win32.Registry/4.5.0": {
@@ -168,7 +168,7 @@
     }
   },
   "libraries": {
-    "TextRankCalc/0.0.1": {
+    "TextListener/0.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
