@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Frontend.Models;
 using System.Net.Http;
 using System.IO;
+using System.Net.Http.Headers;
+using System.Web;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Frontend.Controllers
 {
@@ -25,17 +27,30 @@ namespace Frontend.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> TextDetails(string id)
+        {
+            HttpClient httpClient = new HttpClient();
+            HttpResponseMessage response = await httpClient.GetAsync("http://127.0.0.1:4888/api/values/" + id);
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            ViewData["rank"] = responseBody;
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Upload(string data)
         {
-            string id = null; 
+            string id = null;
             HttpClient httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri("http://127.0.0.1:4888/");
-            string json = JsonConvert.SerializeObject(data);
-            HttpContent content = new StringContent(json);
+            FormUrlEncodedContent content = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>("value", data)
+            });
             HttpResponseMessage response = await httpClient.PostAsync("/api/values", content);
             id = await response.Content.ReadAsStringAsync();
-            return Ok(id);
+            return new RedirectResult("http://localhost:5000/Home/TextDetails/" + id);
         }
 
         public IActionResult Error()
