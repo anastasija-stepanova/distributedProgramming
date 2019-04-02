@@ -10,18 +10,15 @@ namespace TextRankCalc
         {
             var database = RedisStore.database;
             var subscriber = database.Multiplexer.GetSubscriber();
-            subscriber.Subscribe("TextCreated", (channel, message) => {
+            subscriber.Subscribe("events", (channel, message) => {
 
-                int vowels = Regex.Matches(database.StringGet((string)message), @"[aeiouy]", RegexOptions.IgnoreCase).Count;
-                int consonants = Regex.Matches(database.StringGet((string)message), @"[bcdfghjklmnpqrstvwxz]", RegexOptions.IgnoreCase).Count;
-                double rank = (double)vowels / consonants;
-                string id = "Rank_" + (string)message;
-                database.StringSet(id, rank);
-                Console.WriteLine("string message: " + id);
-                Console.WriteLine("message: " + id);
-                Console.WriteLine("Rank: " + database.StringGet(id));
+                string id = (string)message;
+                string value = database.StringGet(id);
+
+                database.ListLeftPush("counter_queue", message);
+                database.Multiplexer.GetSubscriber().Publish("counter_hints", "");
             });
-
+            Console.WriteLine("Obsevable subscribe text rank calc is ready. For exit press Enter.");
             Console.ReadLine(); 
         }
     }

@@ -23,7 +23,6 @@ namespace Backend.Controllers
             var id = Guid.NewGuid().ToString();
             this.SaveToDatabase(database, id, value);
             this.CreateEvent(redis, id, "events", value);
-            this.CreateEvent(redis, id, "TextCreated");
             return id;
         }
 
