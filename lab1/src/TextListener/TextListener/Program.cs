@@ -11,7 +11,6 @@ namespace TextListener
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Text listener is running.");
             try
             {
                 ConnectionMultiplexer redisConnection = ConnectionMultiplexer.Connect("localhost:6379");

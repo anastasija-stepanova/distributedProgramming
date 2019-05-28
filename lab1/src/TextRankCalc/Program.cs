@@ -1,25 +1,69 @@
 ﻿using System;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using Core;
+using StackExchange.Redis;
 
 namespace TextRankCalc
 {
     class Program
     {
+        private static Dictionary<string, string> properties = Configuration.GetParameters();
+        
+        const string COUNTER_HINTS_CHANNEL = "counter_hints";
+        const string COUNTER_QUEUE_NAME = "counter_queue";
+
         static void Main(string[] args)
         {
-            var database = RedisStore.database;
-            var subscriber = database.Multiplexer.GetSubscriber();
-            subscriber.Subscribe("events", (channel, message) => {
-
-                string id = (string)message;
-                string value = database.StringGet(id);
-
-                database.ListLeftPush("counter_queue", message);
-                database.Multiplexer.GetSubscriber().Publish("counter_hints", "");
-            });
-            Console.WriteLine("Obsevable subscribe text rank calc is ready. For exit press Enter.");
-            Console.ReadLine(); 
+            try
+            {
+                Console.WriteLine("Text rank calculator is running.");
+                ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379");
+                ISubscriber sub = redis.GetSubscriber();
+                sub.Subscribe("events", (channel, message) =>
+                {
+                    string[] elements = message.ToString().Split(":");
+                    if (elements.Length != 2)
+                    {
+                        return;
+                    }
+                    string id = elements[0];
+                    bool isAccepted = Convert.ToBoolean(elements[1]);
+                    if (!isAccepted)
+                    {
+                        Console.WriteLine("No access.");
+                        return;
+                    }
+                    if (id.Contains("Text_"))
+                    {
+                        IDatabase queueDb = redis.GetDatabase(Convert.ToInt32(4));
+                        int dbNumber = Message.GetDatabaseNumber(queueDb.StringGet(id));
+                        IDatabase redisDb = redis.GetDatabase(dbNumber);
+                        string value = redisDb.StringGet(id);
+                        SendMessage($"{id}", queueDb);
+                        Console.WriteLine("Message sent => " + id + ": " + value);
+                    }
+                });
+                Console.ReadKey();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
+
+        private static void SendMessage(string message, IDatabase db)
+        {
+            // put message to queue
+            db.ListLeftPush(COUNTER_QUEUE_NAME, message, flags: CommandFlags.FireAndForget);
+            // and notify consumers
+            db.Multiplexer.GetSubscriber().Publish(COUNTER_HINTS_CHANNEL, "");
+        }
+
+        private static string GetTextById(IDatabase db, string id)
+        {
+            string savedData = db.StringGet(id);
+            return savedData;
+        }
+
     }
 }
