@@ -20,7 +20,7 @@ namespace TextListener
                     string id = message.ToString();
                     if (id.Contains("Text_"))
                     {
-                        IDatabase queueDb = redisConnection.GetDatabase(Convert.ToInt32(4));
+                        IDatabase queueDb = redisConnection.GetDatabase(4);
                         int dbNumber = Message.GetDatabaseNumber(queueDb.StringGet(id));
                         IDatabase redisDb = redisConnection.GetDatabase(dbNumber);
                         string value = redisDb.StringGet(id);

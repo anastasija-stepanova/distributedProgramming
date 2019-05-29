@@ -11,32 +11,39 @@ namespace TextRankCalc
         public static ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379");
         static void Main(string[] args)
         {
-            ISubscriber sub = redis.GetSubscriber();
-            sub.Subscribe("events", (channel, message) =>
+            try
             {
-                string[] elements = message.ToString().Split(":");
-                if (elements.Length != 2)
+                ISubscriber sub = redis.GetSubscriber();
+                sub.Subscribe("events", (channel, message) =>
                 {
-                    return;
-                }
-                string id = elements[0];
-                bool isAccepted = Convert.ToBoolean(elements[1]);
-                if (!isAccepted)
-                {
-                    Console.WriteLine("No access.");
-                    return;
-                }
-                if (id.Contains("Text_"))
-                {
-                    IDatabase queueDb = redis.GetDatabase(Convert.ToInt32(4));
-                    int dbNumber = Message.GetDatabaseNumber(queueDb.StringGet(id));
-                    IDatabase redisDb = redis.GetDatabase(dbNumber);
-                    string value = redisDb.StringGet(id);
-                    SendMessage($"{id}", queueDb);
-                    Console.WriteLine("Message sent => " + id + ": " + value);
-                }
-            });
-            Console.ReadKey();
+                    string[] elements = message.ToString().Split(":");
+                    if (elements.Length != 2)
+                    {
+                        return;
+                    }
+                    string id = elements[0];
+                    bool isAccepted = Convert.ToBoolean(elements[1]);
+                    if (!isAccepted)
+                    {
+                        Console.WriteLine("No access.");
+                        return;
+                    }
+                    if (id.Contains("Text_"))
+                    {
+                        IDatabase queueDb = redis.GetDatabase(4);
+                        int dbNumber = Message.GetDatabaseNumber(queueDb.StringGet(id));
+                        IDatabase redisDb = redis.GetDatabase(dbNumber);
+                        string value = redisDb.StringGet(id);
+                        SendMessage($"{id}", queueDb);
+                        Console.WriteLine("Message sent => " + id + ": " + value);
+                    }
+                });
+                Console.ReadKey();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         private static void SendMessage(string message, IDatabase db)

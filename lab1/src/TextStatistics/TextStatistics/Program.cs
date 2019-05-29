@@ -66,7 +66,8 @@ namespace TextStatistics
                         Console.WriteLine(GetResult());
                     }
                 });
-            } catch (Exception e) {
+            } catch (Exception e) 
+            {
                 Console.WriteLine(e.Message);
             }
             Console.ReadLine();
@@ -85,9 +86,7 @@ namespace TextStatistics
 
         private static string GetResult()
         {
-            return "TextNum: " + textNum + ", HighRankPart: " + highRankPart +
-                   ", AvgRank: " +
-                   avgRank + ", NumberRejectedEvents: " + numberRejectedEvents;
+            return "TextNum: " + textNum + ", HighRankPart: " + highRankPart + ", AvgRank: " + avgRank + ", NumberRejectedEvents: " + numberRejectedEvents;
         }
     }
 }

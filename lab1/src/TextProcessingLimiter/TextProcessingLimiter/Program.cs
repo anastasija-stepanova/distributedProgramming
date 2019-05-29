@@ -62,7 +62,7 @@ namespace TextProcessingLimiter
                 Console.WriteLine(e.Message);
             }
         }
-
+        
         private static string ParseData(string msg, int index)
         {
             return msg.Split(':')[index];
